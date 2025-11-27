@@ -1,16 +1,3 @@
-这是一个经过优化的完整代码。
-
-**主要优化与改动说明：**
-
-1.  **默认设置固化**：
-    *   HTML 中的 `<title>`, `<h1>`, `<p>` 标签内容已直接写入您指定的文字。
-    *   JavaScript 中的 `DEFAULT_CONTENT` 对象已更新为与 HTML 一致，确保 JavaScript 加载或重置时不会出现文字跳变。
-2.  **加载速度优化 (Performance)**：
-    *   **预连接 (Preconnect)**：在 `<head>` 中添加了对 Firebase 和 Tailwind CDN 的预连接，减少 DNS 查找和握手时间。
-    *   **立即渲染 (Eager Rendering)**：将初始化逻辑从 `window.load`（等待所有图片/视频加载完）改为 `DOMContentLoaded`（DOM 结构加载完立即执行）。
-    *   **先行网格生成**：在连接 Firebase 数据库之前，先根据默认设置生成网格结构。这意味着用户打开网页会立即看到网格动画，而不需要等待数据库连接成功，大大提升了“感知速度”。当数据库数据到达后，会自动平滑更新内容。
-
-```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -18,7 +5,6 @@
     <link rel="preconnect" href="https://firebasestorage.googleapis.com">
     <link rel="preconnect" href="https://www.gstatic.com">
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
-    
     <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/design-c9479.firebasestorage.app/o/favicon.png?alt=media&token=8a15574c-525d-4855-88f3-60f91dc7b45a" />
     <link rel="shortcut icon" href="https://firebasestorage.googleapis.com/v0/b/design-c9479.firebasestorage.app/o/favicon.png?alt=media&token=8a15574c-525d-4855-88f3-60f91dc7b45a" />
     <meta charset="UTF-8"/>
@@ -733,4 +719,3 @@
     </div>
 </body>
 </html>
-```
