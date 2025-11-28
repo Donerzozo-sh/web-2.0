@@ -128,11 +128,13 @@
         .detail-page {
             position: fixed;
             inset: 0;
-            background: #000000;
+            background: #ffffff;
             z-index: 60;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
+            display: flex;
+            overflow: hidden;
         }
         
         .detail-page.active {
@@ -140,75 +142,174 @@
             visibility: visible;
         }
         
-        .detail-header {
-            background: rgba(17, 24, 39, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #374151;
+        /* 左侧视频区域 */
+        .detail-video-section {
+            width: 50%;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000000;
         }
         
-        .detail-content {
-            overflow-y: auto;
-        }
-        
-        .video-section video {
+        .detail-video-section video {
             width: 100%;
-            height: auto;
-            max-height: 70vh;
-            object-fit: contain;
-            background: #000;
-            border-radius: 8px;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
         
-        .text-section {
+        /* 右侧内容区域 */
+        .detail-content-section {
+            width: 50%;
+            height: 100vh;
+            overflow-y: auto;
+            position: relative;
+            background: #ffffff;
+        }
+        
+        /* 返回按钮 */
+        .detail-back-btn {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            z-index: 70;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #000000;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        
+        .detail-back-btn:hover {
+            opacity: 0.7;
+        }
+        
+        .detail-back-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+        }
+        
+        /* 文字内容样式 */
+        .detail-content-wrapper {
+            padding: 80px 60px 60px 60px;
             text-align: left;
         }
         
         .detail-title {
-            color: #ffffff;
+            color: #000000;
             font-weight: bold;
+            font-size: 36px;
             line-height: 1.2;
-            margin-bottom: 1.5rem;
+            margin-bottom: 32px;
         }
         
         .detail-text {
-            color: #d1d5db;
-            line-height: 1.7;
+            color: #000000;
+            font-size: 16px;
+            line-height: 1.8;
             white-space: pre-wrap;
         }
         
+        /* 编辑模式样式 */
         .edit-title-input {
             width: 100%;
-            background: #374151;
-            border: 2px solid #6366f1;
+            background: #f8f9fa;
+            border: 2px solid #007bff;
             border-radius: 8px;
-            padding: 12px 16px;
-            color: #ffffff;
+            padding: 16px;
+            color: #000000;
             font-weight: bold;
-            font-size: inherit;
+            font-size: 36px;
             line-height: 1.2;
-            margin-bottom: 1.5rem;
+            margin-bottom: 32px;
+            outline: none;
         }
         
         .edit-text-input {
             width: 100%;
-            background: #374151;
-            border: 2px solid #6366f1;
+            background: #f8f9fa;
+            border: 2px solid #007bff;
             border-radius: 8px;
             padding: 16px;
-            color: #d1d5db;
-            font-size: inherit;
-            line-height: 1.7;
-            min-height: 200px;
+            color: #000000;
+            font-size: 16px;
+            line-height: 1.8;
+            min-height: 300px;
             resize: vertical;
+            outline: none;
         }
         
+        /* 管理员编辑按钮 */
+        .detail-edit-btn {
+            position: absolute;
+            top: 40px;
+            right: 160px;
+            z-index: 70;
+            background: #6366f1;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border: none;
+        }
+        
+        .detail-edit-btn:hover {
+            background: #5855eb;
+        }
+        
+        /* 响应式设计 */
         @media (max-width: 768px) {
-            .detail-content-grid {
-                flex-direction: column !important;
+            .detail-page {
+                flex-direction: column;
             }
             
-            .video-section {
-                margin-bottom: 2rem;
+            .detail-video-section {
+                width: 100%;
+                height: 50vh;
+            }
+            
+            .detail-content-section {
+                width: 100%;
+                height: 50vh;
+            }
+            
+            .detail-content-wrapper {
+                padding: 60px 30px 30px 30px;
+            }
+            
+            .detail-title {
+                font-size: 28px;
+                margin-bottom: 24px;
+            }
+            
+            .edit-title-input {
+                font-size: 28px;
+                margin-bottom: 24px;
+                padding: 12px;
+            }
+            
+            .edit-text-input {
+                padding: 12px;
+                min-height: 200px;
+            }
+            
+            .detail-back-btn,
+            .detail-edit-btn {
+                top: 20px;
+                right: 20px;
+            }
+            
+            .detail-edit-btn {
+                right: 100px;
             }
         }
     </style>
@@ -555,8 +656,11 @@
             
             currentDetailItem = itemId;
             
-            // 设置视频
+            // 设置视频并自动播放
             detailVideo.src = data.vid;
+            detailVideo.muted = true; // 确保自动播放能正常工作
+            detailVideo.autoplay = true;
+            detailVideo.loop = true;
             
             // 设置文字内容
             detailTitleEl.textContent = data.title || `项目 ${itemId.split('_')[1]}`;
@@ -574,8 +678,14 @@
             
             // 重置编辑模式
             isDetailEditMode = false;
-            detailDisplayContainer.classList.remove('hidden');
-            detailEditContainer.classList.add('hidden');
+            detailDisplayContainer.style.display = 'block';
+            detailEditContainer.style.display = 'none';
+            
+            // 开始播放视频
+            detailVideo.play().catch(e => {
+                // 如果自动播放失败，静默处理
+                console.log('自动播放失败:', e);
+            });
         };
         
         window.closeDetailPage = () => {
@@ -605,12 +715,12 @@
                 editDetailTitleEl.value = data.title || '';
                 editDetailTextEl.value = data.content || '';
                 
-                detailDisplayContainer.classList.add('hidden');
-                detailEditContainer.classList.remove('hidden');
+                detailDisplayContainer.style.display = 'none';
+                detailEditContainer.style.display = 'block';
             } else {
                 // 退出编辑模式
-                detailDisplayContainer.classList.remove('hidden');
-                detailEditContainer.classList.add('hidden');
+                detailDisplayContainer.style.display = 'block';
+                detailEditContainer.style.display = 'none';
             }
         };
         
@@ -664,14 +774,14 @@
                 viewToggleBtn.classList.remove('hidden');
                 
                 // 显示详情页编辑按钮
-                document.getElementById('detail-edit-btn').classList.remove('hidden');
+                document.getElementById('detail-edit-btn').style.display = 'block';
             } else {
                 symbol.classList.remove('text-red-400'); symbol.classList.add('text-gray-400','hover:text-white');
                 topContentArea.classList.remove('border-b-4','border-red-600');
                 viewToggleBtn.classList.add('hidden');
                 
                 // 隐藏详情页编辑按钮
-                document.getElementById('detail-edit-btn').classList.add('hidden');
+                document.getElementById('detail-edit-btn').style.display = 'none';
             }
         };
         
@@ -1237,52 +1347,47 @@
 
     <!-- 详情页面 -->
     <div id="detail-page" class="detail-page">
-        <!-- 详情页顶部导航 -->
-        <div class="detail-header sticky top-0 z-50">
-            <div class="flex items-center justify-between p-6">
-                <button onclick="closeDetailPage()" class="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    <span>返回</span>
-                </button>
-                <button id="detail-edit-btn" onclick="toggleDetailEditMode()" class="hidden px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                    编辑内容
-                </button>
-            </div>
+        <!-- 返回按钮 -->
+        <div class="detail-back-btn" onclick="closeDetailPage()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span>返回</span>
         </div>
 
-        <!-- 详情页内容 -->
-        <div class="detail-content p-6 md:p-12">
-            <div class="detail-content-grid flex flex-col lg:flex-row gap-8 lg:gap-12 max-w-7xl mx-auto">
-                <!-- 左侧视频区域 -->
-                <div class="video-section flex-1">
-                    <video id="detail-video" controls class="w-full rounded-lg shadow-lg">
-                        您的浏览器不支持视频播放。
-                    </video>
+        <!-- 管理员编辑按钮 -->
+        <button id="detail-edit-btn" class="detail-edit-btn" onclick="toggleDetailEditMode()" style="display: none;">
+            编辑内容
+        </button>
+
+        <!-- 左侧视频区域 -->
+        <div class="detail-video-section">
+            <video id="detail-video" muted autoplay loop>
+                您的浏览器不支持视频播放。
+            </video>
+        </div>
+
+        <!-- 右侧内容区域 -->
+        <div class="detail-content-section">
+            <div class="detail-content-wrapper">
+                <!-- 显示模式 -->
+                <div id="detail-display-container">
+                    <h1 id="detail-title" class="detail-title">项目标题</h1>
+                    <div id="detail-text" class="detail-text">项目详细介绍内容...</div>
                 </div>
 
-                <!-- 右侧文字内容区域 -->
-                <div class="text-section flex-1">
-                    <!-- 显示模式 -->
-                    <div id="detail-display-container" class="text-section">
-                        <h1 id="detail-title" class="detail-title text-3xl md:text-4xl lg:text-5xl">项目标题</h1>
-                        <div id="detail-text" class="detail-text text-base md:text-lg">项目详细介绍内容...</div>
-                    </div>
-
-                    <!-- 编辑模式 -->
-                    <div id="detail-edit-container" class="hidden">
-                        <input id="edit-detail-title" type="text" placeholder="输入项目标题..." class="edit-title-input text-3xl md:text-4xl lg:text-5xl">
-                        <textarea id="edit-detail-text" placeholder="输入项目详细介绍..." class="edit-text-input text-base md:text-lg"></textarea>
-                        
-                        <div class="flex space-x-4 mt-6">
-                            <button onclick="saveDetailContent()" class="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">
-                                保存内容
-                            </button>
-                            <button onclick="toggleDetailEditMode()" class="px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition">
-                                取消编辑
-                            </button>
-                        </div>
+                <!-- 编辑模式 -->
+                <div id="detail-edit-container" style="display: none;">
+                    <input id="edit-detail-title" type="text" placeholder="输入项目标题..." class="edit-title-input">
+                    <textarea id="edit-detail-text" placeholder="输入项目详细介绍..." class="edit-text-input"></textarea>
+                    
+                    <div class="flex space-x-4 mt-6">
+                        <button onclick="saveDetailContent()" class="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">
+                            保存内容
+                        </button>
+                        <button onclick="toggleDetailEditMode()" class="px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition">
+                            取消编辑
+                        </button>
                     </div>
                 </div>
             </div>
