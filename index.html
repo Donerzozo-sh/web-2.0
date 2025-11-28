@@ -156,7 +156,47 @@
         .detail-video-section video {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* 改为 contain，保持宽高比且完整显示 */
+            object-fit: contain;
+            display: block;
+        }
+        
+        /* 音量控制按钮 */
+        .video-sound-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0,0,0,0.7);
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            z-index: 80;
+        }
+        
+        .video-sound-btn:hover {
+            background: rgba(0,0,0,0.9);
+        }
+        
+        .video-sound-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+        
+        .video-sound-btn .sound-off {
+            display: none;
+        }
+        
+        .video-sound-btn.muted .sound-on {
+            display: none;
+        }
+        
+        .video-sound-btn.muted .sound-off {
             display: block;
         }
         
@@ -310,6 +350,18 @@
             
             .detail-edit-btn {
                 right: 100px;
+            }
+            
+            .video-sound-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .video-sound-btn svg {
+                width: 20px;
+                height: 20px;
             }
         }
     </style>
@@ -646,6 +698,20 @@
             container.innerHTML = html;
         }
         
+        // 音量控制函数
+        window.toggleVideoSound = () => {
+            const video = document.getElementById('detail-video');
+            const soundBtn = document.getElementById('video-sound-toggle');
+            
+            if (video.muted) {
+                video.muted = false;
+                soundBtn.classList.remove('muted');
+            } else {
+                video.muted = true;
+                soundBtn.classList.add('muted');
+            }
+        };
+        
         // 详情页面相关函数
         window.openDetailPage = (itemId) => {
             const data = itemData[itemId] || {
@@ -661,6 +727,12 @@
             detailVideo.muted = true; // 确保自动播放能正常工作
             detailVideo.autoplay = true;
             detailVideo.loop = true;
+            
+            // 重置音量按钮状态为静音
+            const soundBtn = document.getElementById('video-sound-toggle');
+            if (soundBtn) {
+                soundBtn.classList.add('muted');
+            }
             
             // 设置文字内容
             detailTitleEl.textContent = data.title || `项目 ${itemId.split('_')[1]}`;
@@ -1365,6 +1437,20 @@
             <video id="detail-video" muted autoplay loop>
                 您的浏览器不支持视频播放。
             </video>
+            
+            <!-- 音量控制按钮 -->
+            <button id="video-sound-toggle" class="video-sound-btn muted" onclick="toggleVideoSound()">
+                <!-- 有声音图标 -->
+                <svg class="sound-on" viewBox="0 0 24 24">
+                    <path d="M3 9v6h4l5 5V4L7 9H3z"/>
+                    <path d="M13 5.83v12.34c1.78-.77 3-2.53 3-4.67 0-2.14-1.22-3.9-3-4.67z"/>
+                </svg>
+                <!-- 静音图标 -->
+                <svg class="sound-off" viewBox="0 0 24 24">
+                    <path d="M3 9v6h4l5 5V4L7 9H3z"/>
+                    <path d="m21 12-6-6v12l6-6z"/>
+                </svg>
+            </button>
         </div>
 
         <!-- 右侧内容区域 -->
@@ -1421,4 +1507,3 @@
     </div>
 </body>
 </html>
-
