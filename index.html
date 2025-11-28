@@ -160,7 +160,7 @@
             display: block;
         }
         
-        /* 音量控制容器 */
+        /* Windows风格音量控制容器 */
         .video-controls {
             position: absolute;
             bottom: 30px;
@@ -177,74 +177,108 @@
             opacity: 1;
         }
 
-        /* 音量滑块 */
+        /* Windows风格音量滑块 */
         .volume-slider {
-            width: 80px;
+            width: 100px;
             height: 4px;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.3);
             border-radius: 2px;
             outline: none;
             cursor: pointer;
             -webkit-appearance: none;
             appearance: none;
+            transition: background 0.2s ease;
         }
 
+        .volume-slider:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Windows风格滑块thumb */
         .volume-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: #333;
+            background: #ffffff;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            border: 2px solid #f0f0f0;
+            transition: all 0.2s ease;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            background: #e0e0e0;
+            transform: scale(1.1);
         }
 
         .volume-slider::-moz-range-thumb {
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: #333;
+            background: #ffffff;
             cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border: 2px solid #f0f0f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            -moz-appearance: none;
+            transition: all 0.2s ease;
         }
 
-        /* 音量按钮 */
+        .volume-slider::-moz-range-thumb:hover {
+            background: #e0e0e0;
+            transform: scale(1.1);
+        }
+
+        /* Windows风格音量按钮 */
         .video-sound-btn {
-            position: static;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            border-radius: 8px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: background 0.2s ease;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
         }
 
         .video-sound-btn:hover {
-            background: rgba(0,0,0,0.9);
+            background: rgba(0, 0, 0, 0.85);
+            transform: scale(1.05);
         }
 
+        .video-sound-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* SVG图标控制 */
         .video-sound-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: white;
+            width: 22px;
+            height: 22px;
+            position: absolute;
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
-        .video-sound-btn .sound-off {
-            display: none;
-        }
-
-        .video-sound-btn.muted .sound-on {
-            display: none;
-        }
-
+        /* 显示对应的图标状态 */
         .video-sound-btn.muted .sound-off {
-            display: block;
+            opacity: 1;
+        }
+
+        .video-sound-btn.low .sound-low {
+            opacity: 1;
+        }
+
+        .video-sound-btn.medium .sound-medium {
+            opacity: 1;
+        }
+
+        .video-sound-btn.high .sound-high {
+            opacity: 1;
         }
         
         /* 右侧内容区域 */
@@ -402,21 +436,21 @@
             .video-controls {
                 bottom: 20px;
                 right: 20px;
-                gap: 10px;
+                gap: 12px;
             }
             
             .volume-slider {
-                width: 60px;
+                width: 80px;
             }
             
             .video-sound-btn {
-                width: 36px;
-                height: 36px;
+                width: 40px;
+                height: 40px;
             }
             
             .video-sound-btn svg {
-                width: 18px;
-                height: 18px;
+                width: 20px;
+                height: 20px;
             }
         }
     </style>
@@ -753,41 +787,52 @@
             container.innerHTML = html;
         }
         
-        // 音量控制函数
+        // Windows风格音量控制函数
         window.toggleVideoSound = () => {
             const video = document.getElementById('detail-video');
             const soundBtn = document.getElementById('video-sound-toggle');
             const volumeSlider = document.getElementById('volume-slider');
             
-            if (video.muted) {
+            if (video.muted || video.volume === 0) {
                 video.muted = false;
-                soundBtn.classList.remove('muted');
-                volumeSlider.value = video.volume || 0.5;
-                video.volume = volumeSlider.value;
+                const targetVolume = parseFloat(volumeSlider.value) || 0.5;
+                video.volume = targetVolume;
+                volumeSlider.value = targetVolume;
+                updateVolumeIcon(targetVolume);
             } else {
                 video.muted = true;
-                soundBtn.classList.add('muted');
-                volumeSlider.value = 0;
+                updateVolumeIcon(0);
             }
         };
 
-        // 音量滑块控制函数
+        // Windows风格音量滑块控制函数
         window.updateVideoVolume = () => {
             const video = document.getElementById('detail-video');
             const volumeSlider = document.getElementById('volume-slider');
-            const soundBtn = document.getElementById('video-sound-toggle');
             
             const volume = parseFloat(volumeSlider.value);
             video.volume = volume;
+            video.muted = volume === 0;
+            updateVolumeIcon(volume);
+        };
+
+        // 更新Windows风格音量图标显示
+        function updateVolumeIcon(volume) {
+            const soundBtn = document.getElementById('video-sound-toggle');
+            
+            // 清除所有状态类
+            soundBtn.classList.remove('muted', 'low', 'medium', 'high');
             
             if (volume === 0) {
-                video.muted = true;
                 soundBtn.classList.add('muted');
+            } else if (volume <= 0.33) {
+                soundBtn.classList.add('low');
+            } else if (volume <= 0.66) {
+                soundBtn.classList.add('medium');
             } else {
-                video.muted = false;
-                soundBtn.classList.remove('muted');
+                soundBtn.classList.add('high');
             }
-        };
+        }
         
         // 详情页面相关函数
         window.openDetailPage = (itemId) => {
@@ -811,6 +856,7 @@
             if (soundBtn && volumeSlider) {
                 soundBtn.classList.add('muted');
                 volumeSlider.value = 0;
+                updateVolumeIcon(0);
             }
             
             // 设置文字内容
@@ -1262,10 +1308,12 @@
             detailEditContainer = document.getElementById('detail-edit-container');
             detailDisplayContainer = document.getElementById('detail-display-container');
             
-            // 添加音量滑块事件监听器
+            // 初始化音量控制
             const volumeSlider = document.getElementById('volume-slider');
             if (volumeSlider) {
                 volumeSlider.addEventListener('input', updateVideoVolume);
+                // 初始化图标状态
+                updateVolumeIcon(0);
             }
             
             gridContainer.addEventListener('mouseenter', () => {
@@ -1523,20 +1571,37 @@
                 您的浏览器不支持视频播放。
             </video>
             
-            <!-- 音量控制组件 - ✨ 完美对齐版本 -->
+            <!-- Windows风格音量控制组件 -->
             <div class="video-controls">
                 <input type="range" id="volume-slider" class="volume-slider" min="0" max="1" step="0.1" value="0">
                 <button id="video-sound-toggle" class="video-sound-btn muted" onclick="toggleVideoSound()">
-                    <!-- ✨ 完美对齐的有声音图标 -->
-                    <svg class="sound-on" viewBox="0 0 24 24" fill="white">
-                        <path d="M3 10v4h3l4 4V6l-4 4H3z"/>
-                        <path d="M14 9v6c1.5-1 1.5-5 0-6z"/>
-                        <path d="M16 7v10c2.5-2 2.5-8 0-10z"/>
+                    <!-- Windows风格 - 静音状态 -->
+                    <svg class="sound-off" viewBox="0 0 24 24" fill="none">
+                        <!-- 喇叭主体 -->
+                        <path d="M3 9v6h4l5 5V4l-5 5H3z" fill="white"/>
+                        <!-- 静音X标记 -->
+                        <path d="M16.5 9l4 4m0-4l-4 4" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
                     </svg>
-                    <!-- ✨ 完美对齐的静音图标 -->
-                    <svg class="sound-off" viewBox="0 0 24 24" fill="white">
-                        <path d="M3 10v4h3l4 4V6l-4 4H3z"/>
-                        <path d="M16.5 9.5L19 12l-2.5 2.5M16.5 14.5L19 12l2.5 2.5" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    
+                    <!-- Windows风格 - 低音量 -->
+                    <svg class="sound-low" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 9v6h4l5 5V4l-5 5H3z" fill="white"/>
+                        <path d="M14.5 10.5c.8.8.8 2.2 0 3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    
+                    <!-- Windows风格 - 中音量 -->
+                    <svg class="sound-medium" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 9v6h4l5 5V4l-5 5H3z" fill="white"/>
+                        <path d="M14.5 10.5c.8.8.8 2.2 0 3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M16 8.5c1.2 1.2 1.2 5.8 0 7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    
+                    <!-- Windows风格 - 高音量 -->
+                    <svg class="sound-high" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 9v6h4l5 5V4l-5 5H3z" fill="white"/>
+                        <path d="M14.5 10.5c.8.8.8 2.2 0 3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M16 8.5c1.2 1.2 1.2 5.8 0 7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M17.5 6.5c1.8 1.8 1.8 9.2 0 11" stroke="white" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                 </button>
             </div>
