@@ -160,42 +160,89 @@
             display: block;
         }
         
-        /* 音量控制按钮 */
-        .video-sound-btn {
+        /* 音量控制容器 */
+        .video-controls {
             position: absolute;
             bottom: 30px;
             right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 80;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .detail-video-section:hover .video-controls {
+            opacity: 1;
+        }
+
+        /* 音量滑块 */
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #333;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #333;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        /* 音量按钮 */
+        .video-sound-btn {
+            position: static;
             background: rgba(0,0,0,0.7);
             border: none;
             border-radius: 50%;
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: background 0.2s ease;
-            z-index: 80;
         }
-        
+
         .video-sound-btn:hover {
             background: rgba(0,0,0,0.9);
         }
-        
+
         .video-sound-btn svg {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             fill: white;
         }
-        
+
         .video-sound-btn .sound-off {
             display: none;
         }
-        
+
         .video-sound-btn.muted .sound-on {
             display: none;
         }
-        
+
         .video-sound-btn.muted .sound-off {
             display: block;
         }
@@ -352,16 +399,24 @@
                 right: 100px;
             }
             
-            .video-sound-btn {
+            .video-controls {
                 bottom: 20px;
                 right: 20px;
-                width: 40px;
-                height: 40px;
+                gap: 10px;
+            }
+            
+            .volume-slider {
+                width: 60px;
+            }
+            
+            .video-sound-btn {
+                width: 36px;
+                height: 36px;
             }
             
             .video-sound-btn svg {
-                width: 20px;
-                height: 20px;
+                width: 18px;
+                height: 18px;
             }
         }
     </style>
@@ -702,13 +757,35 @@
         window.toggleVideoSound = () => {
             const video = document.getElementById('detail-video');
             const soundBtn = document.getElementById('video-sound-toggle');
+            const volumeSlider = document.getElementById('volume-slider');
             
             if (video.muted) {
                 video.muted = false;
                 soundBtn.classList.remove('muted');
+                volumeSlider.value = video.volume || 0.5;
+                video.volume = volumeSlider.value;
             } else {
                 video.muted = true;
                 soundBtn.classList.add('muted');
+                volumeSlider.value = 0;
+            }
+        };
+
+        // 音量滑块控制函数
+        window.updateVideoVolume = () => {
+            const video = document.getElementById('detail-video');
+            const volumeSlider = document.getElementById('volume-slider');
+            const soundBtn = document.getElementById('video-sound-toggle');
+            
+            const volume = parseFloat(volumeSlider.value);
+            video.volume = volume;
+            
+            if (volume === 0) {
+                video.muted = true;
+                soundBtn.classList.add('muted');
+            } else {
+                video.muted = false;
+                soundBtn.classList.remove('muted');
             }
         };
         
@@ -728,10 +805,12 @@
             detailVideo.autoplay = true;
             detailVideo.loop = true;
             
-            // 重置音量按钮状态为静音
+            // 重置音量控制状态
             const soundBtn = document.getElementById('video-sound-toggle');
-            if (soundBtn) {
+            const volumeSlider = document.getElementById('volume-slider');
+            if (soundBtn && volumeSlider) {
                 soundBtn.classList.add('muted');
+                volumeSlider.value = 0;
             }
             
             // 设置文字内容
@@ -1183,6 +1262,12 @@
             detailEditContainer = document.getElementById('detail-edit-container');
             detailDisplayContainer = document.getElementById('detail-display-container');
             
+            // 添加音量滑块事件监听器
+            const volumeSlider = document.getElementById('volume-slider');
+            if (volumeSlider) {
+                volumeSlider.addEventListener('input', updateVideoVolume);
+            }
+            
             gridContainer.addEventListener('mouseenter', () => {
                 isMouseOverCanvas = true;
                 isMouseActive = true;
@@ -1438,19 +1523,22 @@
                 您的浏览器不支持视频播放。
             </video>
             
-            <!-- 音量控制按钮 -->
-            <button id="video-sound-toggle" class="video-sound-btn muted" onclick="toggleVideoSound()">
-                <!-- 有声音图标 -->
-                <svg class="sound-on" viewBox="0 0 24 24">
-                    <path d="M3 9v6h4l5 5V4L7 9H3z"/>
-                    <path d="M13 5.83v12.34c1.78-.77 3-2.53 3-4.67 0-2.14-1.22-3.9-3-4.67z"/>
-                </svg>
-                <!-- 静音图标 -->
-                <svg class="sound-off" viewBox="0 0 24 24">
-                    <path d="M3 9v6h4l5 5V4L7 9H3z"/>
-                    <path d="m21 12-6-6v12l6-6z"/>
-                </svg>
-            </button>
+            <!-- 音量控制组件 -->
+            <div class="video-controls">
+                <input type="range" id="volume-slider" class="volume-slider" min="0" max="1" step="0.1" value="0">
+                <button id="video-sound-toggle" class="video-sound-btn muted" onclick="toggleVideoSound()">
+                    <!-- 有声音图标 -->
+                    <svg class="sound-on" viewBox="0 0 24 24">
+                        <path d="M3 9v6h4l5 5V4L7 9H3z"/>
+                        <path d="M13 5.83v12.34c1.78-.77 3-2.53 3-4.67 0-2.14-1.22-3.9-3-4.67z"/>
+                    </svg>
+                    <!-- 静音图标 -->
+                    <svg class="sound-off" viewBox="0 0 24 24">
+                        <path d="M3 9v6h4l5 5V4L7 9H3z"/>
+                        <path d="m21 12-6-6v12l6-6z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- 右侧内容区域 -->
