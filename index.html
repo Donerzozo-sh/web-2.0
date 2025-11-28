@@ -56,10 +56,24 @@
             font-family: 'Roboto Flex', sans-serif;
             font-size: clamp(10px, 8vw, 25px);
             letter-spacing: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #eeeeee;
+        }
+
+        .loading-main-text {
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            color: #eeeeee;
+        }
+
+        .loading-progress {
+            font-size: clamp(8px, 4vw, 16px);
+            margin-top: 20px;
+            opacity: 0.8;
+            text-align: center;
         }
         
         #loading-text span {
@@ -230,7 +244,7 @@
             transform: scale(1.1);
         }
 
-        /* Windows风格音量按钮 */
+        /* Windows风格音量按钮 - 去除毛玻璃效果 */
         .video-sound-btn {
             background: rgba(0, 0, 0, 0.7);
             border: none;
@@ -242,7 +256,6 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
             position: relative;
         }
 
@@ -458,7 +471,10 @@
 <body>
     <!-- 纯文字动画加载界面 -->
     <div id="loading-overlay" class="loading-overlay">
-        <div id="loading-text"></div>
+        <div id="loading-text">
+            <div class="loading-main-text"></div>
+            <div class="loading-progress">Loading: <span id="loading-percentage">0%</span></div>
+        </div>
     </div>
 
     <script type="module">
@@ -468,8 +484,8 @@
         
         // 初始化文字动画
         function initLoadingAnimation() {
-            const text = "Design is loading...";
-            const container = document.getElementById("loading-text");
+            const text = "REDesign  ®  2025";
+            const container = document.querySelector('.loading-main-text');
             container.innerHTML = ''; // 清空容器
             
             text.split("").forEach((char, i) => {
@@ -486,6 +502,7 @@
                 this.totalItems = 60;
                 this.loadedItems = 0;
                 this.loadingOverlay = document.getElementById('loading-overlay');
+                this.percentageEl = document.getElementById('loading-percentage');
                 this.imageCache = new Map();
                 this.loadingQueue = [];
                 this.maxConcurrent = 6;
@@ -495,6 +512,10 @@
             }
             
             updateProgress() {
+                // 更新百分比显示
+                const percentage = Math.round((this.loadedItems / this.totalItems) * 100);
+                this.percentageEl.textContent = percentage + '%';
+                
                 // 检查是否所有内容都已加载
                 if (this.loadedItems === this.totalItems) {
                     // 确保动画显示足够长时间
@@ -1661,4 +1682,3 @@
     </div>
 </body>
 </html>
-
