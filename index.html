@@ -624,7 +624,7 @@
         let editContainer, contentDisplay, topContentArea;
         let editWebTitleEl, editTitleEl, editSubtitleEl;
         let editTitleWeightEl, editSubtitleWeightEl, editTitleSpacingEl, editSubtitleSpacingEl;
-        let editTitleColorEl, editSubtitleColorEl;
+        let editTitleColorEl, editSubtitleColorEl, editTitleSizeEl, editSubtitleSizeEl;
         let editFisheyeRadiusEl, editDecayPowerEl, editMinScaleEl, editMaxScaleEl;
         let editParallaxSmoothingEl, editCanvasScaleEl, editCanvasOffsetXEl;
         let editTwinkleFrequencyEl, editTwinkleAmplitudeEl;
@@ -671,8 +671,18 @@
             title: "3D&Motion Creative&Production",
             subtitle: "Powerd by REDesign",
             webTitle: "多媒体设计作品集",
-            titleStyle: { weight: 'font-extrabold', spacing: 'tracking-normal', color: '#ffffff' },
-            subtitleStyle: { weight: 'font-normal', spacing: 'tracking-normal', color: '#9CA3AF' }
+            titleStyle: { 
+                weight: 'font-extrabold', 
+                spacing: 'tracking-normal', 
+                color: '#ffffff',
+                fontSize: '8xl'  // 新增字体大小
+            },
+            subtitleStyle: { 
+                weight: 'font-normal', 
+                spacing: 'tracking-normal', 
+                color: '#9CA3AF',
+                fontSize: '2xl'  // 新增字体大小
+            }
         };
         let items = [];
         let itemData = {};
@@ -688,8 +698,10 @@
             if (!el) return;
             el.className = el.className.replace(/font-(extrabold|bold|medium|normal|light|thin)/g, '');
             el.className = el.className.replace(/tracking-(tighter|tight|normal|wide|wider|widest)/g, '');
+            el.className = el.className.replace(/text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)/g, '');
             el.classList.add(style.weight || 'font-normal');
             el.classList.add(style.spacing || 'tracking-normal');
+            el.classList.add(`text-${style.fontSize}` || 'text-base');
             el.style.color = style.color || '#ffffff';
         }
         
@@ -1180,10 +1192,18 @@
                                          mainTitleEl.classList.contains('font-medium') ? 'font-medium' : 'font-normal';
                 editTitleSpacingEl.value = mainTitleEl.classList.toString().match(/tracking-\w+/)?.[0] || 'tracking-normal';
                 editTitleColorEl.value = mainTitleEl.style.color || '#ffffff';
+                // 获取当前字体大小
+                const titleSizeClass = mainTitleEl.classList.toString().match(/text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)/)?.[0];
+                editTitleSizeEl.value = titleSizeClass ? titleSizeClass.replace('text-', '') : '8xl';
+                
                 editSubtitleWeightEl.value = subTextEl.classList.contains('font-bold') ? 'font-bold' :
                                             subTextEl.classList.contains('font-medium') ? 'font-medium' : 'font-normal';
                 editSubtitleSpacingEl.value = subTextEl.classList.toString().match(/tracking-\w+/)?.[0] || 'tracking-normal';
                 editSubtitleColorEl.value = subTextEl.style.color || '#9CA3AF';
+                // 获取当前字体大小
+                const subtitleSizeClass = subTextEl.classList.toString().match(/text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)/)?.[0];
+                editSubtitleSizeEl.value = subtitleSizeClass ? subtitleSizeClass.replace('text-', '') : '2xl';
+                
                 editFisheyeRadiusEl.value = currentFisheyeRadius;
                 editDecayPowerEl.value = currentDecayPower;
                 editMinScaleEl.value = currentMinScale;
@@ -1210,12 +1230,14 @@
                 titleStyle: {
                     weight: editTitleWeightEl.value,
                     spacing: editTitleSpacingEl.value,
-                    color: editTitleColorEl.value
+                    color: editTitleColorEl.value,
+                    fontSize: editTitleSizeEl.value
                 },
                 subtitleStyle: {
                     weight: editSubtitleWeightEl.value,
                     spacing: editSubtitleSpacingEl.value,
-                    color: editSubtitleColorEl.value
+                    color: editSubtitleColorEl.value,
+                    fontSize: editSubtitleSizeEl.value
                 },
                 fisheyeSettings: {
                     radius: parseFloat(editFisheyeRadiusEl.value) || 300,
@@ -1253,6 +1275,8 @@
             editSubtitleSpacingEl = document.getElementById('edit-subtitle-spacing');
             editTitleColorEl = document.getElementById('edit-title-color');
             editSubtitleColorEl = document.getElementById('edit-subtitle-color');
+            editTitleSizeEl = document.getElementById('edit-title-size');
+            editSubtitleSizeEl = document.getElementById('edit-subtitle-size');
             editFisheyeRadiusEl = document.getElementById('edit-fisheye-radius');
             editDecayPowerEl = document.getElementById('edit-decay-power');
             editMinScaleEl = document.getElementById('edit-min-scale');
@@ -1423,7 +1447,7 @@
                     <div class="p-4 bg-gray-800 rounded-lg">
                         <label class="block text-lg font-medium text-white mb-2">主标题</label>
                         <input id="edit-title" type="text" class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white p-2" value="3D&Motion Creative&Production"/>
-                        <div class="grid grid-cols-3 gap-3 mt-3">
+                        <div class="grid grid-cols-4 gap-3 mt-3">
                             <div>
                                 <label class="block text-sm font-medium text-gray-400 mb-1">字重</label>
                                 <select id="edit-title-weight" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2">
@@ -1444,6 +1468,24 @@
                                 </select>
                             </div>
                             <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">字体大小</label>
+                                <select id="edit-title-size" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2">
+                                    <option value="xs">XS</option>
+                                    <option value="sm">SM</option>
+                                    <option value="base">Base</option>
+                                    <option value="lg">LG</option>
+                                    <option value="xl">XL</option>
+                                    <option value="2xl">2XL</option>
+                                    <option value="3xl">3XL</option>
+                                    <option value="4xl">4XL</option>
+                                    <option value="5xl">5XL</option>
+                                    <option value="6xl">6XL</option>
+                                    <option value="7xl">7XL</option>
+                                    <option value="8xl" selected>8XL</option>
+                                    <option value="9xl">9XL</option>
+                                </select>
+                            </div>
+                            <div>
                                 <label class="block text-sm font-medium text-gray-400 mb-1">颜色</label>
                                 <input id="edit-title-color" type="color" value="#ffffff" class="w-full h-10 rounded-md bg-gray-700 border-gray-600 cursor-pointer"/>
                             </div>
@@ -1452,7 +1494,7 @@
                     <div class="p-4 bg-gray-800 rounded-lg">
                         <label class="block text-lg font-medium text-white mb-2">副标题</label>
                         <input id="edit-subtitle" type="text" class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white p-2" value="Powerd by REDesign"/>
-                        <div class="grid grid-cols-3 gap-3 mt-3">
+                        <div class="grid grid-cols-4 gap-3 mt-3">
                             <div>
                                 <label class="block text-sm font-medium text-gray-400 mb-1">字重</label>
                                 <select id="edit-subtitle-weight" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2">
@@ -1470,6 +1512,24 @@
                                     <option value="tracking-normal" selected>默认</option>
                                     <option value="tracking-wide">宽</option>
                                     <option value="tracking-wider">更宽</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">字体大小</label>
+                                <select id="edit-subtitle-size" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2">
+                                    <option value="xs">XS</option>
+                                    <option value="sm">SM</option>
+                                    <option value="base">Base</option>
+                                    <option value="lg">LG</option>
+                                    <option value="xl">XL</option>
+                                    <option value="2xl" selected>2XL</option>
+                                    <option value="3xl">3XL</option>
+                                    <option value="4xl">4XL</option>
+                                    <option value="5xl">5XL</option>
+                                    <option value="6xl">6XL</option>
+                                    <option value="7xl">7XL</option>
+                                    <option value="8xl">8XL</option>
+                                    <option value="9xl">9XL</option>
                                 </select>
                             </div>
                             <div>
