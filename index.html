@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -51,59 +52,32 @@
             transition: opacity 1.2s ease-out, visibility 1.2s ease-out;
         }
         
-        /* REDesign 文字动画样式 */
+        /* 新的加载文字样式 */
         #loading-text {
             font-family: 'Roboto Flex', sans-serif;
             font-size: clamp(10px, 8vw, 25px);
-            letter-spacing: 10;
-            display: inline-flex;
-            justify-content: center;
+            display: flex;
             align-items: center;
+            gap: 0.5em;
             color: #cccccc;
+            font-weight: 300;
+            letter-spacing: 2px;
         }
         
-        #loading-text span {
-            font-family: 'Roboto Flex', sans-serif;
-            font-optical-sizing: auto;
-            font-style: normal;
-            font-weight: 100;
-            font-variation-settings:
-                "slnt" 0,
-                "wdth" 100,
-                "GRAD" 0,
-                "XOPQ" 96,
-                "XTRA" 468,
-                "YOPQ" 79,
-                "YTAS" 750,
-                "YTDE" -203,
-                "YTFI" 738,
-                "YTLC" 514,
-                "YTUC" 712;
-            animation: weightPulse 1s infinite cubic-bezier(0.645, 0.045, 0.355, 1);
+        /* 下横线呼吸灯效果 */
+        .loading-underscore {
+            animation: breathe 1.5s ease-in-out infinite;
         }
         
-        @keyframes weightPulse {
-            0%   { font-variation-settings: "wght" 100; }
-            5%   { font-variation-settings: "wght" 175; }
-            10%  { font-variation-settings: "wght" 250; }
-            15%  { font-variation-settings: "wght" 325; }
-            20%  { font-variation-settings: "wght" 400; }
-            25%  { font-variation-settings: "wght" 475; }
-            30%  { font-variation-settings: "wght" 550; }
-            35%  { font-variation-settings: "wght" 625; }
-            40%  { font-variation-settings: "wght" 700; }
-            45%  { font-variation-settings: "wght" 750; }
-            50%  { font-variation-settings: "wght" 800; }
-            55%  { font-variation-settings: "wght" 825; }
-            60%  { font-variation-settings: "wght" 850; }
-            65%  { font-variation-settings: "wght" 775; }
-            70%  { font-variation-settings: "wght" 700; }
-            75%  { font-variation-settings: "wght" 625; }
-            80%  { font-variation-settings: "wght" 550; }
-            85%  { font-variation-settings: "wght" 450; }
-            90%  { font-variation-settings: "wght" 350; }
-            95%  { font-variation-settings: "wght" 225; }
-            100% { font-variation-settings: "wght" 100; }
+        @keyframes breathe {
+            0%, 100% { 
+                opacity: 0.3; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.1);
+            }
         }
         
         .loading-overlay.hidden {
@@ -468,16 +442,20 @@
         
         // 初始化文字动画
         function initLoadingAnimation() {
-            const text = "REDesign  ®  2025";
             const container = document.getElementById("loading-text");
-            container.innerHTML = ''; // 清空容器
-            
-            text.split("").forEach((char, i) => {
-                const span = document.createElement("span");
-                span.textContent = char;
-                span.style.animationDelay = (i * 0.15) + "s";
-                container.appendChild(span);
-            });
+            container.innerHTML = `
+                <span class="loading-underscore">_</span>
+                <span>REDesign</span>
+                <span id="loading-progress">0%</span>
+            `;
+        }
+        
+        // 更新加载进度
+        function updateLoadingProgress(percentage) {
+            const progressElement = document.getElementById("loading-progress");
+            if (progressElement) {
+                progressElement.textContent = `${Math.round(percentage)}%`;
+            }
         }
         
         // 简化的加载管理器（移除进度条）
@@ -495,6 +473,10 @@
             }
             
             updateProgress() {
+                // 更新进度百分比显示
+                const percentage = (this.loadedItems / this.totalItems) * 100;
+                updateLoadingProgress(percentage);
+                
                 // 检查是否所有内容都已加载
                 if (this.loadedItems === this.totalItems) {
                     // 确保动画显示足够长时间
@@ -653,10 +635,11 @@
         let editContainer, contentDisplay, topContentArea;
         let editWebTitleEl, editTitleEl, editSubtitleEl;
         let editTitleWeightEl, editSubtitleWeightEl, editTitleSpacingEl, editSubtitleSpacingEl;
-        let editTitleColorEl, editSubtitleColorEl;
+        let editTitleColorEl, editSubtitleColorEl, editTitleSizeEl, editSubtitleSizeEl;
         let editFisheyeRadiusEl, editDecayPowerEl, editMinScaleEl, editMaxScaleEl;
         let editParallaxSmoothingEl, editCanvasScaleEl, editCanvasOffsetXEl;
         let editTwinkleFrequencyEl, editTwinkleAmplitudeEl;
+        let editLoadingColorEl, editLoadingWeightEl, editLoadingSpacingEl;
         let adminToggleBtn, viewToggleBtn;
         let authModal, authUsernameEl, authPasswordEl, authErrorMessageEl, adminTableContainer;
         
@@ -700,8 +683,9 @@
             title: "3D&Motion Creative&Production",
             subtitle: "Powerd by REDesign",
             webTitle: "多媒体设计作品集",
-            titleStyle: { weight: 'font-extrabold', spacing: 'tracking-normal', color: '#ffffff' },
-            subtitleStyle: { weight: 'font-normal', spacing: 'tracking-normal', color: '#9CA3AF' }
+            titleStyle: { weight: 'font-extrabold', spacing: 'tracking-normal', color: '#ffffff', size: '4xl' },
+            subtitleStyle: { weight: 'font-normal', spacing: 'tracking-normal', color: '#9CA3AF', size: 'base' },
+            loadingStyle: { color: '#cccccc', weight: '300', spacing: '2px' }
         };
         let items = [];
         let itemData = {};
@@ -717,9 +701,20 @@
             if (!el) return;
             el.className = el.className.replace(/font-(extrabold|bold|medium|normal|light|thin)/g, '');
             el.className = el.className.replace(/tracking-(tighter|tight|normal|wide|wider|widest)/g, '');
+            el.className = el.className.replace(/text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl)/g, '');
             el.classList.add(style.weight || 'font-normal');
             el.classList.add(style.spacing || 'tracking-normal');
+            el.classList.add(`text-${style.size || 'base'}`);
             el.style.color = style.color || '#ffffff';
+        }
+        
+        function applyLoadingStyles(loadingStyle) {
+            const loadingText = document.getElementById('loading-text');
+            if (!loadingText) return;
+            
+            loadingText.style.color = loadingStyle.color || '#cccccc';
+            loadingText.style.fontWeight = loadingStyle.weight || '300';
+            loadingText.style.letterSpacing = loadingStyle.spacing || '2px';
         }
         
         function renderLocationThumbnail(index, color) {
@@ -1209,10 +1204,12 @@
                                          mainTitleEl.classList.contains('font-medium') ? 'font-medium' : 'font-normal';
                 editTitleSpacingEl.value = mainTitleEl.classList.toString().match(/tracking-\w+/)?.[0] || 'tracking-normal';
                 editTitleColorEl.value = mainTitleEl.style.color || '#ffffff';
+                editTitleSizeEl.value = mainTitleEl.classList.toString().match(/text-(\w+)/)?.[1] || '4xl';
                 editSubtitleWeightEl.value = subTextEl.classList.contains('font-bold') ? 'font-bold' :
                                             subTextEl.classList.contains('font-medium') ? 'font-medium' : 'font-normal';
                 editSubtitleSpacingEl.value = subTextEl.classList.toString().match(/tracking-\w+/)?.[0] || 'tracking-normal';
                 editSubtitleColorEl.value = subTextEl.style.color || '#9CA3AF';
+                editSubtitleSizeEl.value = subTextEl.classList.toString().match(/text-(\w+)/)?.[1] || 'base';
                 editFisheyeRadiusEl.value = currentFisheyeRadius;
                 editDecayPowerEl.value = currentDecayPower;
                 editMinScaleEl.value = currentMinScale;
@@ -1222,6 +1219,15 @@
                 editCanvasOffsetXEl.value = currentCanvasOffsetX;
                 editTwinkleFrequencyEl.value = currentTwinkleFrequency;
                 editTwinkleAmplitudeEl.value = currentTwinkleAmplitude;
+                
+                // 设置加载页面样式
+                const loadingText = document.getElementById('loading-text');
+                if (loadingText) {
+                    editLoadingColorEl.value = loadingText.style.color || '#cccccc';
+                    editLoadingWeightEl.value = loadingText.style.fontWeight || '300';
+                    editLoadingSpacingEl.value = loadingText.style.letterSpacing || '2px';
+                }
+                
                 contentDisplay.classList.add('hidden');
                 editContainer.classList.remove('hidden');
             } else {
@@ -1239,12 +1245,19 @@
                 titleStyle: {
                     weight: editTitleWeightEl.value,
                     spacing: editTitleSpacingEl.value,
-                    color: editTitleColorEl.value
+                    color: editTitleColorEl.value,
+                    size: editTitleSizeEl.value
                 },
                 subtitleStyle: {
                     weight: editSubtitleWeightEl.value,
                     spacing: editSubtitleSpacingEl.value,
-                    color: editSubtitleColorEl.value
+                    color: editSubtitleColorEl.value,
+                    size: editSubtitleSizeEl.value
+                },
+                loadingStyle: {
+                    color: editLoadingColorEl.value,
+                    weight: editLoadingWeightEl.value,
+                    spacing: editLoadingSpacingEl.value
                 },
                 fisheyeSettings: {
                     radius: parseFloat(editFisheyeRadiusEl.value) || 300,
@@ -1282,6 +1295,8 @@
             editSubtitleSpacingEl = document.getElementById('edit-subtitle-spacing');
             editTitleColorEl = document.getElementById('edit-title-color');
             editSubtitleColorEl = document.getElementById('edit-subtitle-color');
+            editTitleSizeEl = document.getElementById('edit-title-size');
+            editSubtitleSizeEl = document.getElementById('edit-subtitle-size');
             editFisheyeRadiusEl = document.getElementById('edit-fisheye-radius');
             editDecayPowerEl = document.getElementById('edit-decay-power');
             editMinScaleEl = document.getElementById('edit-min-scale');
@@ -1291,6 +1306,9 @@
             editCanvasOffsetXEl = document.getElementById('edit-canvas-offset-x');
             editTwinkleFrequencyEl = document.getElementById('edit-twinkle-frequency');
             editTwinkleAmplitudeEl = document.getElementById('edit-twinkle-amplitude');
+            editLoadingColorEl = document.getElementById('edit-loading-color');
+            editLoadingWeightEl = document.getElementById('edit-loading-weight');
+            editLoadingSpacingEl = document.getElementById('edit-loading-spacing');
             adminToggleBtn = document.getElementById('admin-toggle-btn');
             viewToggleBtn = document.getElementById('view-toggle-btn');
             authModal = document.getElementById('auth-modal');
@@ -1316,16 +1334,24 @@
                 updateVolumeIcon(0);
             }
             
-            gridContainer.addEventListener('mouseenter', () => {
+            // 修复鼠标交互区域：确保整个屏幕都能响应鼠标事件
+            document.addEventListener('mouseenter', () => {
                 isMouseOverCanvas = true;
                 isMouseActive = true;
                 startAnimationLoop();
             });
-            gridContainer.addEventListener('mouseleave', () => {
+            
+            document.addEventListener('mouseleave', () => {
                 isMouseOverCanvas = false;
             });
+            
             window.addEventListener('mousemove', e => {
                 mousePos = {x: e.clientX, y: e.clientY};
+                isMouseOverCanvas = true;
+                if (!isMouseActive) {
+                    isMouseActive = true;
+                    startAnimationLoop();
+                }
             });
             
             // 修改点击事件：从打开视频模态框改为打开详情页面
@@ -1362,8 +1388,10 @@
                     subTextEl.textContent = d.subtitle || DEFAULT_CONTENT.subtitle;
                     const ts = d.titleStyle || DEFAULT_CONTENT.titleStyle;
                     const ss = d.subtitleStyle || DEFAULT_CONTENT.subtitleStyle;
+                    const ls = d.loadingStyle || DEFAULT_CONTENT.loadingStyle;
                     applyTextStyles(mainTitleEl, ts);
                     applyTextStyles(subTextEl, ss);
+                    applyLoadingStyles(ls);
                     const s = d.fisheyeSettings || DEFAULT_FISHEYE_SETTINGS;
                     currentFisheyeRadius = s.radius;
                     currentDecayPower = s.decayPower;
@@ -1419,6 +1447,7 @@
                 document.title = DEFAULT_CONTENT.webTitle;
                 mainTitleEl.textContent = DEFAULT_CONTENT.title;
                 subTextEl.textContent = DEFAULT_CONTENT.subtitle;
+                applyLoadingStyles(DEFAULT_CONTENT.loadingStyle);
                 for (let i = 0; i < TOTAL_ITEMS; i++) itemData[`item_${i}`] = { 
                     img: null, 
                     vid: PLACEHOLDER_VID, 
@@ -1445,14 +1474,14 @@
             <p id="sub-text" class="text-gray-400 text-base font-normal cursor-text transition-all duration-500 hover:text-gray-200 pointer-events-auto md:text-2xl tracking-normal" onclick="toggleEditMode(true)">Powerd by REDesign</p>
         </div>
         <div id="edit-mode-container" class="hidden bg-gray-900/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl pointer-events-auto max-w-4xl">
-            <h2 class="text-xl Structural font-bold mb-4 text-red-400">顶部内容及视觉参数编辑 (Admin)</h2>
+            <h2 class="text-xl font-bold mb-4 text-red-400">顶部内容及视觉参数编辑 (Admin)</h2>
             <div class="space-y-4">
                 <div><label class="block text-sm font-medium text-gray-400">网站标题</label><input id="edit-web-title" type="text" class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white p-2" value="灵感矩阵 | 设计作品集"/></div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="p-4 bg-gray-800 rounded-lg">
                         <label class="block text-lg font-medium text-white mb-2">主标题</label>
                         <input id="edit-title" type="text" class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white p-2" value="3D&Motion Creative&Production"/>
-                        <div class="grid grid-cols-3 gap-3 mt-3">
+                        <div class="grid grid-cols-2 gap-3 mt-3">
                             <div>
                                 <label class="block text-sm font-medium text-gray-400 mb-1">字重</label>
                                 <select id="edit-title-weight" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2">
@@ -1476,12 +1505,29 @@
                                 <label class="block text-sm font-medium text-gray-400 mb-1">颜色</label>
                                 <input id="edit-title-color" type="color" value="#ffffff" class="w-full h-10 rounded-md bg-gray-700 border-gray-600 cursor-pointer"/>
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">大小</label>
+                                <select id="edit-title-size" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2">
+                                    <option value="xs">极小</option>
+                                    <option value="sm">小</option>
+                                    <option value="base">基础</option>
+                                    <option value="lg">大</option>
+                                    <option value="xl">较大</option>
+                                    <option value="2xl">很大</option>
+                                    <option value="3xl">超大</option>
+                                    <option value="4xl" selected>极大</option>
+                                    <option value="5xl">巨大</option>
+                                    <option value="6xl">超巨大</option>
+                                    <option value="7xl">最大</option>
+                                    <option value="8xl">特大</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="p-4 bg-gray-800 rounded-lg">
                         <label class="block text-lg font-medium text-white mb-2">副标题</label>
                         <input id="edit-subtitle" type="text" class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white p-2" value="Powerd by REDesign"/>
-                        <div class="grid grid-cols-3 gap-3 mt-3">
+                        <div class="grid grid-cols-2 gap-3 mt-3">
                             <div>
                                 <label class="block text-sm font-medium text-gray-400 mb-1">字重</label>
                                 <select id="edit-subtitle-weight" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2">
@@ -1505,6 +1551,44 @@
                                 <label class="block text-sm font-medium text-gray-400 mb-1">颜色</label>
                                 <input id="edit-subtitle-color" type="color" value="#9CA3AF" class="w-full h-10 rounded-md bg-gray-700 border-gray-600 cursor-pointer"/>
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">大小</label>
+                                <select id="edit-subtitle-size" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2">
+                                    <option value="xs">极小</option>
+                                    <option value="sm">小</option>
+                                    <option value="base" selected>基础</option>
+                                    <option value="lg">大</option>
+                                    <option value="xl">较大</option>
+                                    <option value="2xl">很大</option>
+                                    <option value="3xl">超大</option>
+                                    <option value="4xl">极大</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-800 rounded-lg">
+                    <label class="block text-lg font-medium text-white mb-2">加载页面文字样式</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">颜色</label>
+                            <input id="edit-loading-color" type="color" value="#cccccc" class="w-full h-10 rounded-md bg-gray-700 border-gray-600 cursor-pointer"/>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">字重</label>
+                            <select id="edit-loading-weight" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2">
+                                <option value="100">100</option>
+                                <option value="200">200</option>
+                                <option value="300" selected>300</option>
+                                <option value="400">400</option>
+                                <option value="500">500</option>
+                                <option value="600">600</option>
+                                <option value="700">700</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">字间距</label>
+                            <input id="edit-loading-spacing" type="text" value="2px" placeholder="2px" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2"/>
                         </div>
                     </div>
                 </div>
@@ -1661,5 +1745,4 @@
     </div>
 </body>
 </html>
-
-
+```
