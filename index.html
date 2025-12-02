@@ -22,6 +22,11 @@
             min-height: 100vh;
             user-select: none;
         }
+        
+        /* 自定义字体大小 */
+        .text-10xl { font-size: 9rem; line-height: 1; }
+        .text-12xl { font-size: 12rem; line-height: 1; }
+        
         #grid-container {
             cursor: default;
             width: 140vw;
@@ -675,13 +680,13 @@
                 weight: 'font-extrabold', 
                 spacing: 'tracking-normal', 
                 color: '#ffffff',
-                fontSize: '8xl'  // 新增字体大小
+                fontSize: '8xl'  // 字体大小
             },
             subtitleStyle: { 
                 weight: 'font-normal', 
                 spacing: 'tracking-normal', 
                 color: '#9CA3AF',
-                fontSize: '2xl'  // 新增字体大小
+                fontSize: '2xl'  // 字体大小
             }
         };
         let items = [];
@@ -698,10 +703,12 @@
             if (!el) return;
             el.className = el.className.replace(/font-(extrabold|bold|medium|normal|light|thin)/g, '');
             el.className = el.className.replace(/tracking-(tighter|tight|normal|wide|wider|widest)/g, '');
-            el.className = el.className.replace(/text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)/g, '');
+            el.className = el.className.replace(/text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl|10xl|12xl)/g, '');
             el.classList.add(style.weight || 'font-normal');
             el.classList.add(style.spacing || 'tracking-normal');
-            el.classList.add(`text-${style.fontSize}` || 'text-base');
+            
+            const fontSize = style.fontSize || '8xl';
+            el.classList.add(`text-${fontSize}`);
             el.style.color = style.color || '#ffffff';
         }
         
@@ -1193,7 +1200,7 @@
                 editTitleSpacingEl.value = mainTitleEl.classList.toString().match(/tracking-\w+/)?.[0] || 'tracking-normal';
                 editTitleColorEl.value = mainTitleEl.style.color || '#ffffff';
                 // 获取当前字体大小
-                const titleSizeClass = mainTitleEl.classList.toString().match(/text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)/)?.[0];
+                const titleSizeClass = mainTitleEl.classList.toString().match(/text-(8xl|9xl|10xl|12xl)/)?.[0];
                 editTitleSizeEl.value = titleSizeClass ? titleSizeClass.replace('text-', '') : '8xl';
                 
                 editSubtitleWeightEl.value = subTextEl.classList.contains('font-bold') ? 'font-bold' :
@@ -1201,7 +1208,7 @@
                 editSubtitleSpacingEl.value = subTextEl.classList.toString().match(/tracking-\w+/)?.[0] || 'tracking-normal';
                 editSubtitleColorEl.value = subTextEl.style.color || '#9CA3AF';
                 // 获取当前字体大小
-                const subtitleSizeClass = subTextEl.classList.toString().match(/text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)/)?.[0];
+                const subtitleSizeClass = subTextEl.classList.toString().match(/text-(8xl|9xl|10xl|12xl)/)?.[0];
                 editSubtitleSizeEl.value = subtitleSizeClass ? subtitleSizeClass.replace('text-', '') : '2xl';
                 
                 editFisheyeRadiusEl.value = currentFisheyeRadius;
@@ -1470,19 +1477,10 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-400 mb-1">字体大小</label>
                                 <select id="edit-title-size" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2">
-                                    <option value="xs">XS</option>
-                                    <option value="sm">SM</option>
-                                    <option value="base">Base</option>
-                                    <option value="lg">LG</option>
-                                    <option value="xl">XL</option>
-                                    <option value="2xl">2XL</option>
-                                    <option value="3xl">3XL</option>
-                                    <option value="4xl">4XL</option>
-                                    <option value="5xl">5XL</option>
-                                    <option value="6xl">6XL</option>
-                                    <option value="7xl">7XL</option>
-                                    <option value="8xl" selected>8XL</option>
-                                    <option value="9xl">9XL</option>
+                                    <option value="8xl" selected>标准大 (8XL)</option>
+                                    <option value="9xl">超大 (9XL)</option>
+                                    <option value="10xl">极大 (10XL)</option>
+                                    <option value="12xl">巨大 (12XL)</option>
                                 </select>
                             </div>
                             <div>
@@ -1517,19 +1515,10 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-400 mb-1">字体大小</label>
                                 <select id="edit-subtitle-size" class="w-full rounded-md bg-gray-700 border-gray-600 text-white p-2">
-                                    <option value="xs">XS</option>
-                                    <option value="sm">SM</option>
-                                    <option value="base">Base</option>
-                                    <option value="lg">LG</option>
-                                    <option value="xl">XL</option>
-                                    <option value="2xl" selected>2XL</option>
-                                    <option value="3xl">3XL</option>
-                                    <option value="4xl">4XL</option>
-                                    <option value="5xl">5XL</option>
-                                    <option value="6xl">6XL</option>
-                                    <option value="7xl">7XL</option>
-                                    <option value="8xl">8XL</option>
-                                    <option value="9xl">9XL</option>
+                                    <option value="8xl">标准大 (8XL)</option>
+                                    <option value="9xl">超大 (9XL)</option>
+                                    <option value="10xl">极大 (10XL)</option>
+                                    <option value="12xl">巨大 (12XL)</option>
                                 </select>
                             </div>
                             <div>
@@ -1692,4 +1681,3 @@
     </div>
 </body>
 </html>
-
