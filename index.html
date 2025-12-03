@@ -20,7 +20,7 @@
         
         body {
             font-family: 'Helvetica Now Display', 'Helvetica Neue', Arial, sans-serif;
-            overflow: hidden; /* 防止主页面滚动 */
+            overflow: hidden;
             background-color: #000000;
             min-height: 100vh;
             user-select: none;
@@ -35,9 +35,6 @@
             height: 140vh;
             transform-origin: center center;
             will-change: transform;
-            position: absolute;
-            inset: 0;
-            margin: auto;
         }
         
         .grid-item {
@@ -92,7 +89,7 @@
             position: fixed;
             inset: 0;
             background: #ffffff;
-            z-index: 60; /* 高于网格但低于加载层 */
+            z-index: 60;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -112,14 +109,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #ffffff; /* 修正了多余的f */
+            background: #fffffff;
         }
         
         .detail-video-section video {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            background: #000;
         }
         
         .video-controls {
@@ -218,10 +214,6 @@
             font-weight: 500;
             cursor: pointer;
             transition: opacity 0.2s ease;
-            background: rgba(255,255,255,0.8);
-            padding: 8px 16px;
-            border-radius: 20px;
-            backdrop-filter: blur(4px);
         }
         
         .detail-back-btn:hover { opacity: 0.7; }
@@ -244,7 +236,7 @@
             color: #000000;
             font-size: 16px;
             line-height: 1.8;
-            white-space: pre-wrap; /* 保留换行 */
+            white-space: pre-wrap;
         }
         
         .edit-title-input {
@@ -309,19 +301,18 @@
 
         /* 响应式 */
         @media (max-width: 768px) {
-            .detail-page { flex-direction: column; overflow-y: auto; }
-            .detail-video-section { width: 100%; height: 40vh; min-height: 250px; }
-            .detail-content-section { width: 100%; height: auto; min-height: 60vh; overflow-y: visible; }
-            .detail-content-wrapper { padding: 40px 24px; }
-            .detail-title { font-size: 24px; margin-bottom: 16px; }
-            .edit-title-input { font-size: 24px; margin-bottom: 16px; padding: 12px; }
+            .detail-page { flex-direction: column; }
+            .detail-video-section, .detail-content-section { width: 100%; height: 50vh; }
+            .detail-content-wrapper { padding: 60px 30px 30px; }
+            .detail-title { font-size: 28px; margin-bottom: 24px; }
+            .edit-title-input { font-size: 28px; margin-bottom: 24px; padding: 12px; }
             .edit-text-input { padding: 12px; min-height: 200px; }
-            .detail-back-btn { top: 20px; right: 20px; padding: 6px 12px; font-size: 14px; }
-            .detail-edit-btn { top: 20px; right: 100px; }
-            .video-controls { bottom: 10px; right: 10px; gap: 10px; }
-            .volume-slider { width: 70px; }
-            .video-sound-btn { width: 36px; height: 36px; }
-            .video-sound-btn svg { width: 18px; height: 18px; }
+            .detail-back-btn, .detail-edit-btn { top: 20px; right: 20px; }
+            .detail-edit-btn { right: 100px; }
+            .video-controls { bottom: 20px; right: 20px; gap: 12px; }
+            .volume-slider { width: 80px; }
+            .video-sound-btn { width: 40px; height: 40px; }
+            .video-sound-btn svg { width: 20px; height: 20px; }
         }
         
         /* 滚动条美化 */
@@ -360,7 +351,7 @@
         </div>
         
         <!-- 编辑模式容器 -->
-        <div id="edit-mode-container" class="hidden bg-gray-900/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl pointer-events-auto max-w-4xl mx-auto mt-8 border border-gray-700 overflow-y-auto max-h-[80vh]">
+        <div id="edit-mode-container" class="hidden bg-gray-900/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl pointer-events-auto max-w-4xl">
             <h2 class="text-xl font-bold mb-4 text-red-400">顶部内容及视觉参数编辑 (Admin)</h2>
             <div class="space-y-4">
                 <div>
@@ -497,15 +488,15 @@
     </div>
     
     <!-- 管理员表格视图 -->
-    <div id="admin-table-view" class="fixed inset-0 p-4 md:p-12 z-10 hidden overflow-auto pointer-events-auto pt-24"></div>
+    <div id="admin-table-view" class="fixed inset-0 p-4 md:p-12 z-10 hidden overflow-auto pointer-events-auto"></div>
     
     <!-- 底部版权信息 -->
-    <div id="admin-toggle-btn" class="fixed bottom-4 right-4 z-50 text-gray-400 text-sm font-medium pointer-events-auto cursor-default mix-blend-difference">
+    <div id="admin-toggle-btn" class="fixed bottom-4 right-4 z-50 text-gray-400 text-sm font-medium pointer-events-auto cursor-default">
         2025 <span class="cursor-pointer hover:text-white transition-colors duration-200" onclick="handleAdminToggle()">©</span> All Rights Reserved by REDesign
     </div>
     
     <!-- 网格容器 -->
-    <div id="grid-container" class="grid"></div>
+    <div id="grid-container" class="absolute inset-0 m-auto grid"></div>
 
     <!-- 详情页面 -->
     <div id="detail-page" class="detail-page">
@@ -564,6 +555,18 @@
         </div>
     </div>
 
+    <!-- 视频模态框 -->
+    <div id="video-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex justify-center items-center hidden">
+        <div class="relative w-full h-full max-w-[95vw] max-h-[95vh] flex justify-center items-center">
+            <video id="video-player" class="max-w-full max-h-full object-contain" controls autoplay playsinline></video>
+            <button id="close-modal" class="absolute top-4 right-4 text-white p-3 rounded-full bg-black/60 hover:bg-black/80 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <!-- 认证模态框 -->
     <div id="auth-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex justify-center items-center hidden">
         <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md border border-gray-700">
@@ -587,11 +590,9 @@
     </div>
 
     <script type="module">
-        // Firebase 配置与初始化
-        // 注意：如果遇到版本问题，可尝试回退到 10.x.x 版本
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // ==================== 配置常量 ====================
         const CONFIG = {
@@ -600,7 +601,7 @@
             TOTAL_ITEMS: 60,
             PLACEHOLDER_VID: "https://www.w3schools.com/html/mov_bbb.mp4",
             PARALLAX_INTENSITY: 0.1,
-            MIN_LOADING_TIME: 2500,
+            MIN_LOADING_TIME: 3000,
             GRID_COLORS: ['#EF4444','#F97316','#F59E0B','#10B981','#3B82F6','#6366F1','#8B5CF6','#EC4899','#FBBF24','#A78BFA','#4ADE80','#FB7185','#D946EF','#06B6D4']
         };
         
@@ -646,7 +647,7 @@
             selectedItemId: null,
             currentDetailItem: null,
             animationFrameId: null,
-            mousePos: { x: window.innerWidth/2, y: window.innerHeight/2 },
+            mousePos: { x: 0, y: 0 },
             parallaxOffset: { x: 0, y: 0 },
             items: [],
             itemData: {},
@@ -673,13 +674,13 @@
             }
             
             updateProgress() {
-                const percentage = Math.min(100, Math.round((this.loadedItems / this.totalItems) * 100));
+                const percentage = Math.round((this.loadedItems / this.totalItems) * 100);
                 const textEl = document.getElementById('loading-text');
                 if (textEl) {
                     textEl.innerHTML = `<span id="loading-underscore">_</span>REDesign ${percentage}%`;
                 }
                 
-                if (this.loadedItems >= this.totalItems) {
+                if (this.loadedItems === this.totalItems) {
                     const elapsed = Date.now() - this.startTime;
                     const remaining = Math.max(0, CONFIG.MIN_LOADING_TIME - elapsed);
                     setTimeout(() => this.hideLoading(), remaining);
@@ -954,9 +955,9 @@
             if (video.muted || video.volume === 0) {
                 video.muted = false;
                 const vol = parseFloat(slider.value) || 0.5;
-                video.volume = vol === 0 ? 0.5 : vol; // 如果滑块是0但点击了取消静音，给默认音量
-                slider.value = video.volume;
-                updateVolumeIcon(video.volume);
+                video.volume = vol;
+                slider.value = vol;
+                updateVolumeIcon(vol);
             } else {
                 video.muted = true;
                 updateVolumeIcon(0);
@@ -999,7 +1000,6 @@
             
             document.getElementById('detail-page').classList.add('active');
             
-            // 停止网格动画以节省性能
             state.isMouseActive = false;
             if (state.animationFrameId) {
                 cancelAnimationFrame(state.animationFrameId);
@@ -1010,17 +1010,15 @@
             document.getElementById('detail-display-container').style.display = 'block';
             document.getElementById('detail-edit-container').style.display = 'none';
             
-            video.play().catch(e => console.log("自动播放受限", e));
+            video.play().catch(() => {});
         };
         
         window.closeDetailPage = () => {
             document.getElementById('detail-page').classList.remove('active');
             
             const video = document.getElementById('detail-video');
-            setTimeout(() => {
-                video.pause();
-                video.src = '';
-            }, 300); // 等待过渡动画
+            video.pause();
+            video.src = '';
             
             state.currentDetailItem = null;
             state.isDetailEditMode = false;
@@ -1048,10 +1046,6 @@
         };
         
         window.saveDetailContent = async () => {
-            if (state.isLocalMode) {
-                alert("当前为本地演示模式，无法保存到云端。");
-                return;
-            }
             if (!state.isAdminMode || !state.currentDetailItem || !state.db) return;
             
             const title = document.getElementById('edit-detail-title').value.trim();
@@ -1203,11 +1197,6 @@
         };
         
         window.saveContent = async () => {
-            if (state.isLocalMode) {
-                alert("本地模式无法保存");
-                window.toggleEditMode(false);
-                return;
-            }
             if (!state.isAdminMode || !state.db) return;
             
             const newSettings = {
@@ -1257,8 +1246,8 @@
             if (!container) return;
             
             let html = `
-                <div class="bg-gray-900/95 backdrop-blur-sm rounded-xl p-6 border border-gray-700 pb-24">
-                    <h1 class="text-3xl font-bold mb-6 text-red-400 flex items-center justify-between sticky top-0 bg-gray-900/95 p-4 z-20 border-b border-gray-700">
+                <div class="bg-gray-900/95 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                    <h1 class="text-3xl font-bold mb-6 text-red-400 flex items-center justify-between">
                         网格素材列表编辑 (共 60 个项目)
                         <button onclick="switchView('grid')" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 text-sm">返回网格视图</button>
                     </h1>
@@ -1314,17 +1303,12 @@
         }
         
         window.saveInlineItemChange = async (itemId, imgId, vidId, titleId, contentId, btn) => {
-            if (state.isLocalMode) {
-                alert("本地演示模式无法保存数据。");
-                return;
-            }
-            
             const newImg = document.getElementById(imgId).value.trim();
             const newVid = document.getElementById(vidId).value.trim();
             const newTitle = document.getElementById(titleId).value.trim();
             const newContent = document.getElementById(contentId).value.trim();
             
-            if (!state.db || !state.isAdminMode) return;
+            if (state.isLocalMode || !state.db || !state.isAdminMode) return;
             
             btn.disabled = true;
             btn.textContent = '保存中...';
@@ -1346,7 +1330,7 @@
                 state.itemData[itemId] = { ...state.itemData[itemId], ...data };
                 btn.textContent = '已保存';
                 btn.classList.replace('bg-gray-500', 'bg-green-600');
-                // 如果在当前页面，可以不用重新渲染整个表单，提升体验
+                renderAdminTable();
             } catch (e) {
                 console.error(e);
                 btn.textContent = '失败';
@@ -1391,11 +1375,8 @@
                 const id = el.dataset.videoId;
                 if (state.isAdminMode) {
                     window.switchView('table');
-                    // 延时确保DOM渲染
-                    setTimeout(() => {
-                        const row = document.getElementById('row-' + id);
-                        if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 100);
+                    const row = document.getElementById('row-' + id);
+                    if (row) row.scrollIntoView({ behavior: 'smooth' });
                     return;
                 }
                 
@@ -1487,14 +1468,13 @@
                 });
                 
             } catch (e) {
-                console.warn("Firebase初始化失败或网络受限，已进入本地演示模式", e);
+                console.warn("Firebase初始化失败，进入本地模式", e);
                 state.isLocalMode = true;
                 
                 document.title = DEFAULT_CONTENT.webTitle;
                 elements.mainTitle.textContent = DEFAULT_CONTENT.title;
                 elements.subText.textContent = DEFAULT_CONTENT.subtitle;
                 
-                // 初始化本地数据
                 for (let i = 0; i < CONFIG.TOTAL_ITEMS; i++) {
                     state.itemData[`item_${i}`] = {
                         img: null,
@@ -1513,4 +1493,3 @@
     </script>
 </body>
 </html>
-
