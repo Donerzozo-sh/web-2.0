@@ -901,9 +901,9 @@
             scale = currentMinScale * 0.8;
         } else if (!isMouseOverCanvas || dist >= radius) {
             // 只保留大小缩放闪烁
-            it.el.twinklePhase += 0.004 * it.el.twinkleSpeed * currentTwinkleFrequency;
+            it.el.twinklePhase += 0.01 * it.el.twinkleSpeed * currentTwinkleFrequency;
             const tw = (Math.sin(it.el.twinklePhase) + 1) / 2;
-            scale = currentMinScale * (0.7 + tw * 0.6 * currentTwinkleAmplitude);
+            scale = currentMinScale * (0.5 + tw * 1.5 * currentTwinkleAmplitude);
         } else {
             const p = 1 - dist / radius;
             const e = 1 - Math.pow(1 - p, currentDecayPower);
@@ -1480,5 +1480,6 @@
     </script>
 </body>
 </html>
+
 
 
